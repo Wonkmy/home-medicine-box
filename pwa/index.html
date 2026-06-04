@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Home Medicine Box 是一个隐私优先的家庭药箱管理工具，用来记录药品、有效期、库存和家庭用药。"
+    />
+    <meta name="theme-color" content="#087f72" />
+    <title>Home Medicine Box - 家庭药箱</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Privacy-first medicine cabinet</p>
+          <h1>家庭药箱</h1>
+        </div>
+        <nav>
+          <a href="#features">功能</a>
+          <a href="#privacy">隐私</a>
+          <a class="source-link" href="https://github.com/Wonkmy/home-medicine-box" target="_blank" rel="noreferrer">GitHub</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="workspace">
+          <div class="intro">
+            <p class="eyebrow">轻量 Web 体验版</p>
+            <h2>先整理家里的药，再决定要不要安装 App。</h2>
+            <p>
+              这个页面不需要登录，数据只保存在当前浏览器。你可以快速记录药品、查看即将过期项，并导出 JSON 备份。
+            </p>
+            <div class="actions">
+              <a class="primary-action" href="./downloads/home-medicine-box-android-arm64-v8a-v1.0.0.apk">本地下载 Android</a>
+              <a class="ghost-action" href="./downloads/home-medicine-box-windows-x64-v1.0.0.zip">本地下载 Windows</a>
+              <a class="ghost-action" href="https://github.com/Wonkmy/home-medicine-box/releases/latest" target="_blank" rel="noreferrer">GitHub Release</a>
+              <button id="installBtn" class="ghost-action" hidden>安装到桌面</button>
+            </div>
+          </div>
+
+          <section class="tool-panel" aria-label="家庭药箱工具">
+            <div class="tool-header">
+              <div>
+                <p class="eyebrow">My medicine box</p>
+                <h2>快速药箱</h2>
+              </div>
+              <div class="tool-actions">
+                <button id="exportBtn" title="导出数据">导出</button>
+                <label class="file-btn" title="导入数据">
+                  导入
+                  <input id="importFile" type="file" accept="application/json,.json" />
+                </label>
+              </div>
+            </div>
+
+            <form id="medicineForm" class="medicine-form">
+              <label>
+                药品名
+                <input id="nameInput" required placeholder="例如 布洛芬" />
+              </label>
+              <label>
+                存放位置
+                <input id="locationInput" placeholder="例如 客厅药箱" />
+              </label>
+              <label>
+                数量
+                <input id="quantityInput" type="number" min="0" value="1" />
+              </label>
+              <label>
+                有效期
+                <input id="expireInput" type="date" />
+              </label>
+              <label>
+                标签
+                <select id="tagInput">
+                  <option>常备药</option>
+                  <option>儿童</option>
+                  <option>老人</option>
+                  <option>感冒</option>
+                  <option>慢病</option>
+                  <option>外用</option>
+                </select>
+              </label>
+              <button type="submit">添加药品</button>
+            </form>
+
+            <div class="stats-grid">
+              <div>
+                <span id="totalCount">0</span>
+                <small>药品</small>
+              </div>
+              <div>
+                <span id="expiringCount">0</span>
+                <small>将过期</small>
+              </div>
+              <div>
+                <span id="expiredCount">0</span>
+                <small>已过期</small>
+              </div>
+            </div>
+
+            <div class="search-row">
+              <input id="searchInput" placeholder="搜索药品、位置或标签" />
+              <button id="clearBtn" type="button">清空</button>
+            </div>
+
+            <div id="emptyState" class="empty-state">
+              还没有药品。先添加几种家里最常用的药。
+            </div>
+            <ul id="medicineList" class="medicine-list"></ul>
+          </section>
+        </section>
+
+        <section id="features" class="section-band">
+          <div>
+            <p class="eyebrow">Why it matters</p>
+            <h2>解决家庭药箱最真实的问题</h2>
+          </div>
+          <div class="feature-grid">
+            <article>
+              <strong>找得到</strong>
+              <p>记录药品放在哪里，生病时不用翻抽屉。</p>
+            </article>
+            <article>
+              <strong>不过期</strong>
+              <p>提前看到即将过期和已经过期的药。</p>
+            </article>
+            <article>
+              <strong>有记录</strong>
+              <p>记录吃药时间、剂量和家庭成员。</p>
+            </article>
+            <article>
+              <strong>可迁移</strong>
+              <p>完整 App 支持导出、导入药箱数据。</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="privacy" class="privacy-section">
+          <div>
+            <p class="eyebrow">Privacy</p>
+            <h2>默认本地优先，不上传药箱数据。</h2>
+            <p>
+              Web 体验版数据保存在浏览器本地；Flutter App 使用本地 SQLite。账号服务只用于统计账号和订阅状态，不保存药箱、药品和用药记录。
+            </p>
+          </div>
+          <a class="primary-action" href="https://github.com/Wonkmy/home-medicine-box" target="_blank" rel="noreferrer">查看开源仓库</a>
+        </section>
+      </main>
+    </div>
+
+    <template id="medicineItemTemplate">
+      <li class="medicine-card">
+        <div>
+          <div class="card-title-row">
+            <strong data-name></strong>
+            <span data-status></span>
+          </div>
+          <p data-meta></p>
+        </div>
+        <button data-delete title="删除药品">删除</button>
+      </li>
+    </template>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
